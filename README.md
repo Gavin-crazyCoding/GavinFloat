@@ -83,7 +83,7 @@
 ### 环境要求
 - Android 6.0+ (API 23)
 - ARM64 设备
-- 已安装 [Termux](https://github.com/termux/termux-app) (F-Droid 版本)
+- 已安装 [Termux](https://github.com/termux/termux-app) (得和utermux签名相同的版本)
 
 ### 安装步骤
 1. 下载最新 APK 从 [Releases](https://github.com/Gavin-crazyCoding/GavinFloat/releases)
