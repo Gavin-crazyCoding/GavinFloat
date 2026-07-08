@@ -1,7 +1,28 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xmllint --noout /home/kali/GavinFloat/app/src/main/assets/default_menu.xml)"
+      "WebFetch(domain:github.com)",
+      "Read(//home/kali/ZeroTermux-WIKI-main/**)",
+      "Bash(chmod +x /home/kali/GavinFloat/app/src/main/assets/scripts/moe.sh)",
+      "Bash(sed -i 's/\"messages\", msgs/\"messages\", mHistory/' AIChatDialog.java)",
+      "Bash(sed -i 's/applyHighlighting\\(s\\);/mDirty = true; applyHighlighting\\(s\\);/' CodeEditDialog.java)",
+      "Bash(sed -i 's/final String cmd=s\\\\[1\\\\].replace\\(\"{IP}\",mIp.getText\\(\\)\\).replace\\(\"{PORT}\",mPort.getText\\(\\)\\);/final String ip=mIp.getText\\(\\).toString\\(\\).trim\\(\\); final String port=mPort.getText\\(\\).toString\\(\\).trim\\(\\);final String cmd=s[1].replace\\(\"{IP}\",ip\\).replace\\(\"{PORT}\",port\\);/' ReverseShellDialog.java)",
+      "Bash(sed -i 's/if\\(asRoot\\){cmd=\"ssh -p \"+p+\" root@\"+h;}/if\\(asRoot\\){if\\(!pw.isEmpty\\(\\)\\)cmd=\"sshpass -p '\\\\''\"+pw.replace\\(\"'\\\\'\",\"'\\\\''\\\\\\\\\\\\\\\\'\\\\''\"\\)+\"'\\\\'' ssh -o StrictHostKeyChecking=no -p \"+p+\" root@\"+h; else cmd=\"ssh -p \"+p+\" root@\"+h;}/' SshManagerDialog.java)",
+      "Bash(sed -i 's/whois {} 2>\\\\/dev\\\\/null || pkg install whois -y/which whois >\\\\/dev\\\\/null 2>&1 || pkg install whois -y; whois {} | head -30/' NetworkToolsDialog.java)",
+      "Bash(sed -i 's|cd ~/storage/shared 2>/dev/null|cd /data/data/com.termux/files/home 2>/dev/null|' GitManagerDialog.java)",
+      "Bash(sed -i 's/计算Hash/识别Hash/' HashToolkitDialog.java)",
+      "Bash(sed -i 's/new LinearLayout\\(mCtx\\);/new LinearLayout\\(mCtx\\); btns.setOrientation\\(LinearLayout.VERTICAL\\);/' PythonManagerDialog.java)",
+      "Bash(sed -i 's/LinearLayout btns=new LinearLayout\\(mCtx\\);/LinearLayout btns=new LinearLayout\\(mCtx\\); btns.setOrientation\\(LinearLayout.VERTICAL\\);/' PythonManagerDialog.java)",
+      "Bash(grep -v \":0$\")",
+      "Bash(sed -i 's/mPageController = new PageController\\(mMenuView, page -> {/mPageController = new PageController\\(mMenuView, new PageController.PageChangeListener\\(\\) { public void onPageChanged\\(int page\\) {/' FloatingBallService.java)",
+      "Bash(sed -i 's/mPageController, \\(\\) -> {/mPageController, new SettingsController.SettingsChangeListener\\(\\) { public void onSettingsChanged\\(\\) {/' FloatingBallService.java)",
+      "Bash(sed -i 's/settingsBtn.setOnClickListener\\(v -> mSettingsController.show\\(\\)\\);/settingsBtn.setOnClickListener\\(new View.OnClickListener\\(\\) { public void onClick\\(View v\\) { mSettingsController.show\\(\\); }}\\);/' FloatingBallService.java)",
+      "Bash(sed -i 's|output -> mDataInfoContent.post\\(\\(\\) -> mDataInfoContent.setText\\(output.trim\\(\\)\\)\\)\\);|new TermuxCommandHelper.OutputCallback\\(\\) { public void onOutput\\(String output\\) { mDataInfoContent.post\\(new Runnable\\(\\) { public void run\\(\\) { mDataInfoContent.setText\\(output.trim\\(\\)\\); }}\\); }}\\);|' FloatingBallService.java)",
+      "Bash(sed -i 's/ipCard.setOnClickListener\\(v -> {/ipCard.setOnClickListener\\(new View.OnClickListener\\(\\) { public void onClick\\(View v\\) {/' FloatingBallService.java)",
+      "Bash(sed -i 's/qqGroup.setOnClickListener\\(v -> Toast.makeText\\(this,/qqGroup.setOnClickListener\\(new View.OnClickListener\\(\\) { public void onClick\\(View v\\) { Toast.makeText\\(FloatingBallService.this,/' FloatingBallService.java)",
+      "Bash(sed -i 's/tgGroup.setOnClickListener\\(v -> Toast.makeText\\(this,/tgGroup.setOnClickListener\\(new View.OnClickListener\\(\\) { public void onClick\\(View v\\) { Toast.makeText\\(FloatingBallService.this,/' FloatingBallService.java)",
+      "Bash(sed -i 's/mMenuPackageCard.setOnClickListener\\(v -> {/mMenuPackageCard.setOnClickListener\\(new View.OnClickListener\\(\\) { public void onClick\\(View v\\) {/' FloatingBallService.java)",
+      "Bash(sed -i 's/dataCard.setOnClickListener\\(v -> {/dataCard.setOnClickListener\\(new View.OnClickListener\\(\\) { public void onClick\\(View v\\) {/' FloatingBallService.java)"
     ]
   }
 }

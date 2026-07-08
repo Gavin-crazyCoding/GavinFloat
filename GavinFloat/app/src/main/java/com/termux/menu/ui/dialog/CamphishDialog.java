@@ -26,7 +26,7 @@ public class CamphishDialog extends Dialog {
     private EditText mTokenEdit, mPhotoCountEdit, mVideoSecEdit;
 
     public CamphishDialog(Context context) {
-        super(context);
+        super(context, com.termux.menu.R.style.Theme_GavinFloat_Dialog);
         mContext = context;
         mCmdHelper = TermuxCommandHelper.getInstance(context);
         init();

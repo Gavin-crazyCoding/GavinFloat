@@ -50,7 +50,7 @@ public class DownloadCenterDialog extends Dialog {
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
     public DownloadCenterDialog(Context context) {
-        super(context);
+        super(context, com.termux.menu.R.style.Theme_GavinFloat_Dialog);
         mContext = context;
         init();
     }
@@ -261,14 +261,41 @@ public class DownloadCenterDialog extends Dialog {
                         Toast.makeText(mContext, "该文件暂不可下载", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    try {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(di.fullUrl));
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        mContext.startActivity(intent);
-                        Toast.makeText(mContext, "正在打开: " + di.name, Toast.LENGTH_SHORT).show();
-                    } catch (Exception e) {
-                        Toast.makeText(mContext, "无法打开: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
+                    // 真正下载到 /sdcard/Download/
+                    Toast.makeText(mContext, "正在下载: " + di.name, Toast.LENGTH_SHORT).show();
+                    final String url = di.fullUrl;
+                    final String name = di.fileName.isEmpty() ? di.name : di.fileName;
+                    new Thread(new Runnable() {
+                        public void run() {
+                            java.net.HttpURLConnection conn = null;
+                            try {
+                                java.net.URL dlUrl = new java.net.URL(url);
+                                conn = (java.net.HttpURLConnection) dlUrl.openConnection();
+                                conn.setConnectTimeout(15000);
+                                conn.setReadTimeout(30000);
+                                conn.connect();
+                                if (conn.getResponseCode() == 200) {
+                                    java.io.InputStream is = conn.getInputStream();
+                                    String saveName = name.contains(".") ? name : name + ".bin";
+                                    String savePath = "/sdcard/Download/" + saveName;
+                                    java.io.FileOutputStream fos = new java.io.FileOutputStream(savePath);
+                                    byte[] buf = new byte[8192];
+                                    int n; long total = 0;
+                                    while ((n = is.read(buf)) != -1) { fos.write(buf, 0, n); total += n; }
+                                    is.close(); fos.close();
+                                    final String finalPath = savePath;
+                                    new android.os.Handler(android.os.Looper.getMainLooper()).post(
+                                        new Runnable() { public void run() {
+                                            Toast.makeText(mContext, "下载完成: " + finalPath, Toast.LENGTH_LONG).show();
+                                        }});
+                                } else {
+                                    showDownloadError("HTTP " + conn.getResponseCode());
+                                }
+                            } catch (final Exception e) {
+                                showDownloadError(e.getMessage());
+                            } finally { if (conn != null) conn.disconnect(); }
+                        }
+                    }).start();
                 }
             });
         }
@@ -285,6 +312,13 @@ public class DownloadCenterDialog extends Dialog {
     static class DownloadItem {
         String name, note, size, download, fileName, type, fullUrl;
         boolean isDisabled;
+    }
+
+    private void showDownloadError(final String msg) {
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(
+            new Runnable() { public void run() {
+                Toast.makeText(mContext, "下载失败: " + msg, Toast.LENGTH_LONG).show();
+            }});
     }
 
     private int dp(int val) {

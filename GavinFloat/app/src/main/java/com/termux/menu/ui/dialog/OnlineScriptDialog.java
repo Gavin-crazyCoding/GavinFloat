@@ -53,7 +53,7 @@ public class OnlineScriptDialog extends Dialog {
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
     public OnlineScriptDialog(Context context) {
-        super(context);
+        super(context, com.termux.menu.R.style.Theme_GavinFloat_Dialog);
         mContext = context;
         mCmdHelper = TermuxCommandHelper.getInstance(context);
         init();

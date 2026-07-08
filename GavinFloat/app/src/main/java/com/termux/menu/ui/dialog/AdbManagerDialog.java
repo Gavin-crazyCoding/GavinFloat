@@ -26,7 +26,7 @@ public class AdbManagerDialog extends Dialog {
     private Handler mH = new Handler(Looper.getMainLooper());
     private EditText mShellInput, mApkPath, mLocalPort, mRemotePort;
 
-    public AdbManagerDialog(Context c) { super(c); mCtx=c; mCmd=TermuxCommandHelper.getInstance(c); init(); }
+    public AdbManagerDialog(Context c) { super(c, com.termux.menu.R.style.Theme_GavinFloat_Dialog); mCtx=c; mCmd=TermuxCommandHelper.getInstance(c); init(); }
     private void init() {
         requestWindowFeature(Window.FEATURE_NO_TITLE); setCancelable(true);
         ScrollView sv = new ScrollView(mCtx); LinearLayout r = new LinearLayout(mCtx);

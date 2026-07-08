@@ -33,14 +33,33 @@ public class AIChatDialog extends Dialog {
     private Context mCtx; private LinearLayout mChatList; private EditText mInput;
     private ScrollView mScroll; private Handler mH = new Handler(Looper.getMainLooper());
     private String mEndpoint, mKey, mModel;
+    private JSONArray mHistory = new JSONArray();
 
-    public AIChatDialog(Context c) { super(c); mCtx=c; loadConfig(); init(); }
+    public AIChatDialog(Context c) { super(c, com.termux.menu.R.style.Theme_GavinFloat_Dialog); mCtx=c; loadConfig(); init(); loadHistory(); }
     private void loadConfig() {
         SharedPreferences p = mCtx.getSharedPreferences("gavinfloat_api", Context.MODE_PRIVATE);
         mEndpoint = p.getString("api_endpoint", "https://api.deepseek.com/v1");
         mKey = p.getString("api_key", "");
         mModel = p.getString("api_model", "deepseek-chat");
     }
+    private void saveHistory() {
+        mCtx.getSharedPreferences("gavinfloat_chat_history", Context.MODE_PRIVATE)
+            .edit().putString("messages", mHistory.toString()).apply();
+    }
+    private void loadHistory() {
+        try {
+            String json = mCtx.getSharedPreferences("gavinfloat_chat_history", Context.MODE_PRIVATE)
+                .getString("messages", "[]");
+            mHistory = new JSONArray(json);
+            for (int i = 0; i < mHistory.length(); i++) {
+                JSONObject msg = mHistory.getJSONObject(i);
+                String role = msg.optString("role", "");
+                String content = msg.optString("content", "");
+                addMessage(role.equals("user") ? 0xFF1E3A5F : 0xFF2A2A3A, content, false);
+            }
+        } catch (Exception ignored) {}
+    }
+
     private void init() {
         requestWindowFeature(Window.FEATURE_NO_TITLE); setCancelable(true);
         LinearLayout r = new LinearLayout(mCtx); r.setOrientation(LinearLayout.VERTICAL); r.setBackgroundColor(0xFF161823);
@@ -49,6 +68,12 @@ public class AIChatDialog extends Dialog {
         LinearLayout hdr = new LinearLayout(mCtx); hdr.setPadding(dp(16),dp(12),dp(16),dp(12)); hdr.setBackgroundColor(0xFF1E2330);
         TextView title = new TextView(mCtx); title.setText("AI 助手 ("+mModel+")"); title.setTextColor(0xFFFFFFFF); title.setTextSize(16);
         title.setLayoutParams(new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,1)); hdr.addView(title);
+        Button clearBtn = new Button(mCtx); clearBtn.setText("清空"); clearBtn.setTextColor(0xFFFF9800);
+        clearBtn.setBackgroundColor(0x00000000); clearBtn.setTextSize(12);
+        clearBtn.setOnClickListener(new View.OnClickListener(){public void onClick(View v){
+            mChatList.removeAllViews(); mHistory = new JSONArray(); saveHistory();
+            addMessage(0xFF2A2A3A, "历史已清空，开始新对话", false);
+        }}); hdr.addView(clearBtn);
         TextView close = new TextView(mCtx); close.setText("✕"); close.setTextColor(0xFF888888); close.setTextSize(18); close.setPadding(dp(12),0,0,0);
         close.setOnClickListener(new View.OnClickListener(){public void onClick(View v){dismiss();}}); hdr.addView(close);
         r.addView(hdr);
@@ -81,15 +106,36 @@ public class AIChatDialog extends Dialog {
         setContentView(r);
         Window w=getWindow(); if(w!=null){w.setGravity(Gravity.BOTTOM);w.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,(int)(mCtx.getResources().getDisplayMetrics().heightPixels*0.85));w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O)w.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);else w.setType(WindowManager.LayoutParams.TYPE_PHONE);}
 
-        addBotMsg("你好！我是AI助手。可以帮你写代码、解释命令、调试错误。\n请在设置中配置API Key后使用。");
+        addMessage(0xFF2A2A3A, "你好！我是AI助手。可以帮你写代码、解释命令、调试错误。\n请在设置中配置API Key后使用。", false);
+    }
+
+    private void addMessage(int bgColor, String msg, boolean isUser) {
+        TextView tv = new TextView(mCtx); tv.setText(msg); tv.setTextColor(0xFFFFFFFF); tv.setTextSize(13);
+        tv.setBackgroundColor(bgColor); tv.setPadding(dp(12), dp(8), dp(12), dp(8));
+        tv.setTag(isUser ? "user" : "bot");
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.gravity = isUser ? Gravity.END : Gravity.START;
+        lp.bottomMargin = dp(8);
+        lp.leftMargin = isUser ? dp(40) : dp(8);
+        lp.rightMargin = isUser ? dp(8) : dp(40);
+        tv.setLayoutParams(lp);
+        mChatList.addView(tv);
+        mScroll.post(new Runnable(){public void run(){mScroll.fullScroll(View.FOCUS_DOWN);}});
     }
 
     private void sendMessage() {
         final String msg = mInput.getText().toString().trim();
         if(msg.isEmpty()) return;
         if(mKey.isEmpty()){Toast.makeText(mCtx,"请先在设置中配置API Key",Toast.LENGTH_SHORT).show();return;}
-        addUserMsg(msg); mInput.setText("");
-        addBotMsg("思考中...");
+        addMessage(0xFF1E3A5F, msg, true);
+        mInput.setText("");
+        // 保存到历史
+        try {
+            JSONObject userMsg = new JSONObject();
+            userMsg.put("role", "user"); userMsg.put("content", msg);
+            mHistory.put(userMsg); saveHistory();
+        } catch (Exception ignored) {}
+        addMessage(0xFF2A2A3A, "思考中...", false);
         new Thread(new Runnable(){public void run(){
             try {
                 URL url = new URL(mEndpoint+"/chat/completions");
@@ -103,7 +149,7 @@ public class AIChatDialog extends Dialog {
                 body.put("model", mModel);
                 JSONArray msgs = new JSONArray();
                 JSONObject um = new JSONObject(); um.put("role","user"); um.put("content",msg); msgs.put(um);
-                body.put("messages", msgs);
+                body.put("messages", mHistory);
                 body.put("max_tokens", 1024);
 
                 OutputStream os = conn.getOutputStream();
@@ -116,6 +162,12 @@ public class AIChatDialog extends Dialog {
                     while((n=is.read(buf))!=-1)bos.write(buf,0,n); is.close();
                     JSONObject resp = new JSONObject(bos.toString("UTF-8"));
                     final String reply = resp.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
+                    // 保存助手的回复到历史
+                    try {
+                        JSONObject botMsg = new JSONObject();
+                        botMsg.put("role", "assistant"); botMsg.put("content", reply);
+                        mHistory.put(botMsg); saveHistory();
+                    } catch (Exception ignored) {}
                     mH.post(new Runnable(){public void run(){
                         updateLastBotMsg(reply);
                     }});
@@ -134,26 +186,10 @@ public class AIChatDialog extends Dialog {
         }}).start();
     }
 
-    private void addUserMsg(String msg) {
-        TextView tv = new TextView(mCtx); tv.setText(msg); tv.setTextColor(0xFFFFFFFF); tv.setTextSize(13);
-        tv.setBackgroundColor(0xFF1E3A5F); tv.setPadding(dp(12),dp(8),dp(12),dp(8));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.gravity=Gravity.END; lp.bottomMargin=dp(8); lp.leftMargin=dp(40); tv.setLayoutParams(lp);
-        mChatList.addView(tv); mScroll.post(new Runnable(){public void run(){mScroll.fullScroll(View.FOCUS_DOWN);}});
-    }
-
-    private void addBotMsg(String msg) {
-        TextView tv = new TextView(mCtx); tv.setText(msg); tv.setTextColor(0xFFD4D4D4); tv.setTextSize(13);
-        tv.setBackgroundColor(0xFF2A2A3A); tv.setPadding(dp(12),dp(8),dp(12),dp(8));
-        tv.setTag("bot");
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.gravity=Gravity.START; lp.bottomMargin=dp(8); lp.rightMargin=dp(40); tv.setLayoutParams(lp);
-        mChatList.addView(tv); mScroll.post(new Runnable(){public void run(){mScroll.fullScroll(View.FOCUS_DOWN);}});
-    }
 
     private void updateLastBotMsg(String msg) {
         for(int i=mChatList.getChildCount()-1;i>=0;i--){View v=mChatList.getChildAt(i);if("bot".equals(v.getTag())){((TextView)v).setText(msg);return;}}
-        addBotMsg(msg);
+        addMessage(0xFF2A2A3A, msg, false);
     }
 
     private int dp(int v){return (int)(v*mCtx.getResources().getDisplayMetrics().density+0.5f);}

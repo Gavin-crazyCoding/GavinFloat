@@ -26,7 +26,7 @@ public class QuickCommandsDialog extends Dialog {
     private Context mCtx; private TermuxCommandHelper mCmd; private LinearLayout mList; private EditText mName, mCmdEdit;
     private SharedPreferences mPrefs; private List<String[]> mCmds = new ArrayList<>();
 
-    public QuickCommandsDialog(Context c){super(c);mCtx=c;mCmd=TermuxCommandHelper.getInstance(c);mPrefs=mCtx.getSharedPreferences("gavinfloat_cmds",Context.MODE_PRIVATE);init();}
+    public QuickCommandsDialog(Context c){super(c, com.termux.menu.R.style.Theme_GavinFloat_Dialog);mCtx=c;mCmd=TermuxCommandHelper.getInstance(c);mPrefs=mCtx.getSharedPreferences("gavinfloat_cmds",Context.MODE_PRIVATE);init();}
     private void init(){
         requestWindowFeature(Window.FEATURE_NO_TITLE);setCancelable(true);
         ScrollView sv=new ScrollView(mCtx);LinearLayout r=new LinearLayout(mCtx);

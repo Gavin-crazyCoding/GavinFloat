@@ -29,7 +29,7 @@ public class DirbDialog extends Dialog {
     private CheckBox mNotRecursive, mIgnoreRedirects, mCaseInsensitive;
 
     public DirbDialog(Context context) {
-        super(context);
+        super(context, com.termux.menu.R.style.Theme_GavinFloat_Dialog);
         mContext = context;
         mCmdHelper = TermuxCommandHelper.getInstance(context);
         init();

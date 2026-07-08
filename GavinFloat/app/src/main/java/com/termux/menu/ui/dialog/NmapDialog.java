@@ -47,7 +47,7 @@ public class NmapDialog extends Dialog {
     private LinearLayout mAdvancedLayout;
 
     public NmapDialog(Context context) {
-        super(context);
+        super(context, com.termux.menu.R.style.Theme_GavinFloat_Dialog);
         mContext = context;
         mCmdHelper = TermuxCommandHelper.getInstance(context);
         init();

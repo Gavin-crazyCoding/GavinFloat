@@ -43,7 +43,7 @@ public class KaliToolsDialog extends Dialog {
     private TermuxCommandHelper mCmdHelper;
 
     public KaliToolsDialog(Context context) {
-        super(context);
+        super(context, com.termux.menu.R.style.Theme_GavinFloat_Dialog);
         mContext = context;
         mCmdHelper = TermuxCommandHelper.getInstance(context);
         init();

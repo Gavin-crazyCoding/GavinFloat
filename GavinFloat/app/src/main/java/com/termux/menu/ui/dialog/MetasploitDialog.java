@@ -55,7 +55,7 @@ public class MetasploitDialog extends Dialog {
     private Spinner mStagerSpinner;
 
     public MetasploitDialog(Context context) {
-        super(context);
+        super(context, com.termux.menu.R.style.Theme_GavinFloat_Dialog);
         mContext = context;
         mCmdHelper = TermuxCommandHelper.getInstance(context);
         init();

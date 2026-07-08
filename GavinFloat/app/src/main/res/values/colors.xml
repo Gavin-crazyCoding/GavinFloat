@@ -33,4 +33,9 @@
     <color name="premium_purple">#150734</color>
     <color name="premium_card">#18FFFFFF</color>
     <color name="premium_border">#30D4AF37</color>
+    <color name="card_dark">#332A2A3A</color>
+    <color name="accent_cyan">#00E5FF</color>
+    <color name="accent_pink">#FF4081</color>
+    <color name="surface_dark">#1E1E2E</color>
+    <color name="text_muted">#FF888888</color>
 </resources>

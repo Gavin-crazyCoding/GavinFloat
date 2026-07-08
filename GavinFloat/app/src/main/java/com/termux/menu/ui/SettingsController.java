@@ -94,7 +94,9 @@ public class SettingsController {
         themeBtn.setPadding(0, dp(12), 0, dp(12));
         themeBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                new ThemeConfigDialog(mContext).show();
+                new ThemeConfigDialog(mContext, new Runnable() { public void run() {
+                    if (mListener != null) mListener.onSettingsChanged();
+                }}).show();
             }
         });
         ll.addView(themeBtn, new LinearLayout.LayoutParams(

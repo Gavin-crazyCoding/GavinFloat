@@ -37,7 +37,7 @@ public class ApiConfigDialog extends Dialog {
     };
 
     public ApiConfigDialog(Context context) {
-        super(context);
+        super(context, com.termux.menu.R.style.Theme_GavinFloat_Dialog);
         mContext = context;
         init();
     }

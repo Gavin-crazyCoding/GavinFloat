@@ -26,7 +26,7 @@ public class WiFiToolsDialog extends Dialog {
     private EditText mBssidEdit, mChannelEdit, mWordlistEdit, mInterfaceEdit;
 
     public WiFiToolsDialog(Context context) {
-        super(context);
+        super(context, com.termux.menu.R.style.Theme_GavinFloat_Dialog);
         mContext = context;
         mCmdHelper = TermuxCommandHelper.getInstance(context);
         init();
@@ -86,7 +86,7 @@ public class WiFiToolsDialog extends Dialog {
                 btn.setTextSize(12); btn.setPadding(dp(8),dp(8),dp(8),dp(8));
                 btn.setBackgroundColor(0xFF37474F);
                 btn.setOnClickListener(new View.OnClickListener() { public void onClick(View v) {
-                    String c = cmd.replace("{iface}", mInterfaceEdit.getText().toString().trim())
+                    String safeIface = mInterfaceEdit.getText().toString().trim().replaceAll("[^a-zA-Z0-9]", ""); String safeBssid = mBssidEdit.getText().toString().trim().replaceAll("[^a-fA-F0-9:]", ""); String safeCh = mChannelEdit.getText().toString().trim().replaceAll("[^0-9]", ""); String safeWl = mWordlistEdit.getText().toString().trim().replaceAll("[^a-zA-Z0-9/._-]", ""); String c = cmd.replace("{iface}", safeIface)
                         .replace("{bssid}", mBssidEdit.getText().toString().trim())
                         .replace("{ch}", mChannelEdit.getText().toString().trim())
                         .replace("{wordlist}", mWordlistEdit.getText().toString().trim());

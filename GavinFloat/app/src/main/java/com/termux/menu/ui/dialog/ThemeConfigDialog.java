@@ -39,10 +39,12 @@ public class ThemeConfigDialog extends Dialog {
 
     private Context mContext;
     private int mBgColor, mAccentColor, mCardColor;
+    private Runnable mOnChanged;
 
-    public ThemeConfigDialog(Context context) {
-        super(context);
+    public ThemeConfigDialog(Context context, Runnable onChanged) {
+        super(context, com.termux.menu.R.style.Theme_GavinFloat_Dialog);
         mContext = context;
+        mOnChanged = onChanged;
         loadCurrent();
         init();
     }
@@ -106,6 +108,7 @@ public class ThemeConfigDialog extends Dialog {
                     mBgColor = PRESET_COLORS[idx][0]; mAccentColor = PRESET_COLORS[idx][1]; mCardColor = alphaColor(0x18, 0xFF, 0xFF, 0xFF);
                     save();
                     Toast.makeText(mContext, "已应用: " + PRESET_NAMES[idx], Toast.LENGTH_SHORT).show();
+                    if (mOnChanged != null) mOnChanged.run();
                     dismiss();
                 }});
                 row.addView(card);

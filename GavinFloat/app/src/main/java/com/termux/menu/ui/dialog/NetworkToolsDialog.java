@@ -21,7 +21,7 @@ import com.termux.menu.termux.TermuxCommandHelper;
 /** 网络工具箱 — ping/traceroute/nslookup/curl */
 public class NetworkToolsDialog extends Dialog {
     private Context mCtx; private TermuxCommandHelper mCmd; private EditText mTarget;
-    public NetworkToolsDialog(Context c){super(c);mCtx=c;mCmd=TermuxCommandHelper.getInstance(c);init();}
+    public NetworkToolsDialog(Context c){super(c, com.termux.menu.R.style.Theme_GavinFloat_Dialog);mCtx=c;mCmd=TermuxCommandHelper.getInstance(c);init();}
     private void init(){
         requestWindowFeature(Window.FEATURE_NO_TITLE);setCancelable(true);
         ScrollView sv=new ScrollView(mCtx);LinearLayout r=new LinearLayout(mCtx);
@@ -32,7 +32,7 @@ public class NetworkToolsDialog extends Dialog {
 
         String[][] tools={{"Ping(4次)","ping -c 4 {}"},{"Ping(持续)","ping {}"},{"Traceroute","traceroute {}"},
             {"NSLookup","nslookup {}"},{"Curl(GET)","curl -sI {}"},{"Curl(完整)","curl -s {}"},
-            {"Whois","whois {} 2>/dev/null || pkg install whois -y"},{"DNS查所有","dig {} ANY 2>/dev/null || echo 需安装dnsutils"}};
+            {"Whois","which whois >/dev/null 2>whois {} 2>/dev/null || pkg install whois -y1 || pkg install whois -y; whois {} | head -30"},{"DNS查所有","dig {} ANY 2>/dev/null || echo 需安装dnsutils"}};
 
         LinearLayout grid=new LinearLayout(mCtx);grid.setOrientation(LinearLayout.VERTICAL);
         for(int i=0;i<tools.length;i+=2){LinearLayout row=new LinearLayout(mCtx);

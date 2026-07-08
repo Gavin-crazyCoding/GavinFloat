@@ -23,7 +23,7 @@ import com.termux.menu.termux.TermuxCommandHelper;
 public class ProcessManagerDialog extends Dialog {
     private Context mCtx; private TermuxCommandHelper mCmd;
     private LinearLayout mList; private Handler mH = new Handler(Looper.getMainLooper());
-    public ProcessManagerDialog(Context c) { super(c); mCtx=c; mCmd=TermuxCommandHelper.getInstance(c); init(); }
+    public ProcessManagerDialog(Context c) { super(c, com.termux.menu.R.style.Theme_GavinFloat_Dialog); mCtx=c; mCmd=TermuxCommandHelper.getInstance(c); init(); }
     private void init() {
         requestWindowFeature(Window.FEATURE_NO_TITLE); setCancelable(true);
         ScrollView sv = new ScrollView(mCtx); LinearLayout r = new LinearLayout(mCtx);
@@ -39,7 +39,7 @@ public class ProcessManagerDialog extends Dialog {
     private void refresh() {
         mList.removeAllViews();
         TextView loading = new TextView(mCtx); loading.setText("加载中..."); loading.setTextColor(0xFF888888); loading.setTextSize(13); mList.addView(loading);
-        mCmd.executeAndCapture("ps aux --sort=-%mem 2>/dev/null | head -30",new TermuxCommandHelper.OutputCallback(){public void onOutput(String o){
+        mCmd.executeAndCapture("ps aux | head -30 2>/dev/null | head -30",new TermuxCommandHelper.OutputCallback(){public void onOutput(String o){
             mH.post(new Runnable(){public void run(){
                 mList.removeAllViews();
                 final String[] lines = o.split("\n");
@@ -53,8 +53,17 @@ public class ProcessManagerDialog extends Dialog {
                     LinearLayout.LayoutParams ip = new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,1); info.setLayoutParams(ip); row.addView(info);
                     Button kill = new Button(mCtx); kill.setText("KILL"); kill.setTextColor(0xFFF44336); kill.setTextSize(10); kill.setPadding(dp(4),dp(2),dp(4),dp(2)); kill.setBackgroundColor(0x00000000);
                     kill.setOnClickListener(new View.OnClickListener(){public void onClick(View v){
-                        mCmd.sendCommandToTerminal("kill -9 "+pid+" 2>/dev/null || echo 需要权限");
-                        Toast.makeText(mCtx,"已发送kill信号: "+pid,Toast.LENGTH_SHORT).show(); refresh();
+                        new android.app.AlertDialog.Builder(mCtx, com.termux.menu.R.style.Theme_GavinFloat_Dialog)
+                            .setTitle("终止进程")
+                            .setMessage("确定终止 PID " + pid + "? (" + cmd + ")")
+                            .setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
+                                public void onClick(android.content.DialogInterface d, int w) {
+                                    mCmd.sendCommandToTerminal("kill -9 "+pid+" 2>/dev/null || echo 需要权限");
+                                    Toast.makeText(mCtx,"已终止: "+pid,Toast.LENGTH_SHORT).show(); refresh();
+                                }})
+                            .setNegativeButton("取消", new android.content.DialogInterface.OnClickListener() {
+                                public void onClick(android.content.DialogInterface d, int w) { d.dismiss(); }})
+                            .show();
                     }}); row.addView(kill);
                     mList.addView(row);
                 }

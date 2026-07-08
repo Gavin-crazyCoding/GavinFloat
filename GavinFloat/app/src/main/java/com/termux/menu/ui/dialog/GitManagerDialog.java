@@ -22,7 +22,7 @@ import com.termux.menu.termux.TermuxCommandHelper;
 public class GitManagerDialog extends Dialog {
     private Context mCtx; private TermuxCommandHelper mCmd;
     private EditText mRepoUrl, mBranch, mCommitMsg, mDirPath;
-    public GitManagerDialog(Context c){super(c);mCtx=c;mCmd=TermuxCommandHelper.getInstance(c);init();}
+    public GitManagerDialog(Context c){super(c, com.termux.menu.R.style.Theme_GavinFloat_Dialog);mCtx=c;mCmd=TermuxCommandHelper.getInstance(c);init();}
     private void init(){
         requestWindowFeature(Window.FEATURE_NO_TITLE);setCancelable(true);
         ScrollView sv=new ScrollView(mCtx);LinearLayout r=new LinearLayout(mCtx);
@@ -57,7 +57,7 @@ public class GitManagerDialog extends Dialog {
             for(int j=0;j<2&&(i+j)<ops.length;j++){final String cmd=ops[i+j][0];final String label=ops[i+j][1];
                 Button b=btn(label,0xFF37474F);b.setTextSize(11);b.setPadding(dp(6),dp(6),dp(6),dp(6));
                 b.setOnClickListener(new View.OnClickListener(){public void onClick(View v){
-                    String fullCmd="cd ~/storage/shared 2>/dev/null; "+cmd;
+                    String fullCmd="cd /data/data/com.termux/files/home 2>/dev/null; "+cmd;
                     if(cmd.endsWith("-m "))fullCmd+=mCommitMsg.getText().toString().trim();
                     mCmd.sendCommandToTerminal(fullCmd);Toast.makeText(mCtx,label+" 已发送",Toast.LENGTH_SHORT).show();
                 }});

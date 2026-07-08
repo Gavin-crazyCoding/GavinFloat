@@ -4,17 +4,18 @@
     <!-- ====== 1. 常用功能 ====== -->
     <group name="常用功能" id="0">
         <item name="切换源" click="commands:清华源@@ztShell:sed -i s@packages.termux.org@mirrors.tuna.tsinghua.edu.cn/termux@ $PREFIX/etc/apt/sources.list,北京源@@ztShell:sed -i s@packages.termux.org@mirrors.bfsu.edu.cn/termux@ $PREFIX/etc/apt/sources.list,官方源@@ztShell:pkg update -y" listTitle="选择镜像源"/>
-        <item name="容器切换" click="shell_output:ls ~/.termux/container 2>/dev/null || echo 无容器目录" autoRunShell="true"/>
+        <item name="容器切换" click="internal:container_manager"/>
+        <item name="Termux容器切换" click="internal:termux_container_switch"/>
+        <item name="定时任务" click="internal:cron_manager"/>
         <item name="备份恢复" click="commands:备份Home@@ztShell:cd ~ &amp;&amp; tar czf backup_$(date +%Y%m%d).tar.gz . 2>&amp;1,查看备份@@shell_output:ls -lh ~/backup_*.tar.gz 2>/dev/null" listTitle="备份恢复"/>
-        <item name="发行版Linux" click="shell_output:ls ~/termux-install-linux* 2>/dev/null || echo 未安装" autoRunShell="true"/>
-        <item name="QEMU" click="shell_output:which qemu-system-x86_64 2>/dev/null || echo QEMU未安装" autoRunShell="true"/>
-        <item name="定时任务" click="commands:编辑crontab@@editor:/data/data/com.termux/files/home/.termux/crontab,查看crontab@@shell_output:crontab -l 2>/dev/null,安装cronie@@ztShell:pkg install -y cronie" listTitle="定时任务"/>
+        <item name="发行版Linux" click="internal:run_linux_script"/>
+        <item name="MOE全能" click="internal:run_moe_script"/>
+        <item name="QEMU助手" click="internal:run_qemu_script"/>
         <item name="包管理器" click="internal:pkg_manager"/>
         <item name="进程管理" click="internal:process_manager"/>
         <item name="网络工具" click="internal:network_tools"/>
-        <item name="快捷命令" click="internal:quick_commands"/>
+        <item name="端口扫描" click="internal:port_scanner"/>
         <item name="ADB管理器" click="internal:adb_manager"/>
-        <item name="AI助手" click="internal:ai_chat"/>
         <item name="Gavin设置" click="internal:settings"/>
     </group>
 
@@ -25,7 +26,7 @@
         <item name="新建Python项目" click="internal:create_python_project"/>
         <item name="新建PHP项目" click="internal:create_php_project"/>
         <item name="新建NPM项目" click="internal:create_npm_project"/>
-        <item name="打开项目" click="filebrowser:/data/data/com.termux/files/home/projects"/>
+        <item name="打开项目" click="editor:/data/data/com.termux/files/home/projects"/>
     </group>
 
     <!-- ====== 3. X11功能 ====== -->
@@ -38,7 +39,7 @@
         <item name="安装X11" click="commands:安装X11工具@@ztShell:pkg install -y x11-repo xterm,打开项目页@@jumpUrl:https://github.com/termux/termux-x11" listTitle="安装X11"/>
         <item name="显示键盘" click="ztShell:echo show-extra-keys > ~/.termux/termux.properties" autoRunShell="true"/>
         <item name="隐藏键盘" click="ztShell:echo hide-extra-keys > ~/.termux/termux.properties" autoRunShell="true"/>
-        <item name="VNC" click="commands:启动VNC@@ztShell:vncserver -geometry 1280x720 :1,停止VNC@@ztShell:vncserver -kill :1,安装VNC@@ztShell:pkg install -y tigervnc" listTitle="VNC操作"/>
+        <item name="VNC连接" click="internal:vnc_connect"/>
     </group>
 
     <!-- ====== 4. 美化功能 ====== -->
@@ -89,6 +90,8 @@
         <!-- 常用Kali工具 — 13类工具浏览器 -->
         <item name="常用Kali工具" click="internal:kali_tools"/>
         <item name="WiFi工具集" click="internal:wifi_tools"/>
+        <item name="服务管理" click="internal:kali_services"/>
+        <item name="Hash工具包" click="internal:hash_toolkit"/>
 
         <!-- 渗透测试工具GUI — 对齐 Termux X pentest_* 按钮 -->
         <item name="Nmap" click="internal:nmap"/>
@@ -99,7 +102,8 @@
         <item name="CamPhish" click="internal:camphish"/>
 
         <!-- Kali工具快捷集 -->
-        <item name="Kali工具快捷集" click="commands:信息收集@@internal:nmap,Payload生成@@internal:metasploit,SQL注入@@internal:sqlmap,目录扫描@@internal:dirb,钓鱼页面@@internal:seeker,摄像头@@internal:camphish,漏洞扫描@@ztShell:nethunter -r nikto,密码破解@@ztShell:nethunter -r hydra -h,渗透控制台@@ztShell:nethunter -r msfconsole,流量分析@@ztShell:nethunter -r wireshark" listTitle="Kali工具快捷集"/>
+        <item name="反弹Shell" click="internal:reverse_shell"/>
+        <item name="Kali工具快捷集" click="commands:信息收集@@internal:nmap,Payload生成@@internal:metasploit,SQL注入@@internal:sqlmap,目录扫描@@internal:dirb,反弹Shell@@internal:reverse_shell,漏洞扫描@@ztShell:nethunter -r nikto,密码破解@@ztShell:nethunter -r hydra -h,渗透控制台@@ztShell:nethunter -r msfconsole" listTitle="Kali工具快捷集"/>
     </group>
 
     <!-- ====== 8. 线上功能 ====== -->
@@ -128,20 +132,31 @@
         <item name="常用软链" click="shell_output:ls -la ~/storage/ 2>/dev/null || echo 运行termux-setup-storage" autoRunShell="true"/>
         <item name="我的软链" click="shell_output:find ~/ -maxdepth 2 -type l 2>/dev/null" autoRunShell="true"/>
         <item name="卸载模块" click="input:卸载模块@@输入包名@@ztShell:pkg uninstall -y {}" dialogConfirm="true" dialogTitle="确认卸载" dialogMessage="将执行pkg uninstall"/>
-        <item name="远程连接" click="commands:启动SSH@@ztShell:sshd,停止SSH@@ztShell:pkill sshd,安装SSH@@ztShell:pkg install -y openssh" listTitle="远程连接"/>
+        <item name="SSH管理器" click="internal:ssh_manager"/>
         <item name="网页数据" click="jumpUrl:https://wiki.zerotermux.dev"/>
         <item name="数据信息" click="commands:磁盘使用@@shell_output:df -h,内存@@shell_output:free -h,CPU@@shell_output:cat /proc/cpuinfo | head -10,IP@@shell_output:ip addr show | grep inet,完整系统@@shell_output:uname -a" listTitle="数据信息"/>
         <item name="语言设置" click="commands:中文@@internal:language,English@@internal:language" listTitle="语言"/>
         <item name="开源地址" click="jumpUrl:https://github.com/Gavin-CrazyCoding/"/>
     </group>
 
-    <!-- ====== 11. 系统工具 ====== -->
+    <!-- ====== 11. 开发工具 ====== -->
+    <group name="开发工具" id="11">
+        <item name="代码编辑器" click="editor:/data/data/com.termux/files/home"/>
+        <item name="代码模板" click="internal:text_templates"/>
+        <item name="备份管理" click="internal:backup_manager"/>
+        <item name="Python/pip" click="internal:python_manager"/>
+        <item name="磁盘分析器" click="internal:disk_analyzer"/>
+        <item name="Git管理器" click="internal:git_manager"/>
+        <item name="系统仪表盘" click="internal:sys_dashboard"/>
+        <item name="快捷命令" click="internal:quick_commands"/>
+        <item name="AI助手" click="internal:ai_chat"/>
+    </group>
+
+    <!-- ====== 12. 系统工具 ====== -->
     <group name="系统工具" id="9">
         <item name="更新软件包" click="ztShell:pkg update -y" autoRunShell="true" dialogConfirm="true" dialogTitle="确认" dialogMessage="更新软件包列表？"/>
         <item name="升级全部" click="ztShell:pkg upgrade -y" autoRunShell="true" dialogConfirm="true" dialogTitle="确认" dialogMessage="升级所有包？"/>
-        <item name="清理缓存" click="ztShell:pkg autoclean -y" autoRunShell="true"/>
-        <item name="系统仪表盘" click="internal:sys_dashboard"/>
-        <item name="Git管理器" click="internal:git_manager"/>
+        <item name="系统清理" click="internal:system_cleaner"/>
         <item name="查看进程" click="shell_output:ps aux | head -30" autoRunShell="true"/>
         <item name="磁盘使用" click="shell_output:df -h" autoRunShell="true"/>
         <item name="内存信息" click="shell_output:free -h 2>/dev/null || cat /proc/meminfo | head -5" autoRunShell="true"/>
